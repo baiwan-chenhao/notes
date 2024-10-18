@@ -1,0 +1,77 @@
+/* ===主界面 */
+/*信息栏
++ 内部元素居中 
++ 灰色
++ 绝对位于左侧
++ 元素过多时，显示竖拉条
+*/
+#information {
+    text-align: center;
+    color: gray;
+    position: absolute;
+    top: 5%;
+    border: 3px;
+    display: inline;
+    float: left;
+    border: 1px ;
+    color: gray;
+    border-style: none solid none none;
+    width: 250px;
+    height: 90%;
+    overflow-y:auto;
+}
+/* 信息栏的分隔符 */
+#separatrix {
+    border: 2px;
+    border-style: solid none none none;
+    width: 80%;
+    margin-top: 20px;
+    margin-left: 10%;
+    margin-right: 10%;
+
+}
+/* 类别栏
++ 上部固定置顶
+ */
+#column {
+    background-color: rgb(171, 92, 182);
+    float: right;
+    left: 265px;
+    right: 5px;
+    height: auto;
+    position: fixed;
+}
+/* 页信息
++ 距顶固定。
+ */
+#page {
+    float: right;
+    left: 265px;
+    right: 5px;
+    bottom: 0px;
+    top: 105px;
+    position: fixed;
+}
+/* 版权信息 */
+.copyright{
+    text-align: center;
+    font-size: small;
+    color: #757575;
+}
+.row a{
+    color: #000;
+}
+/* ===博客相关 */
+
+/* 博客的标题 */
+.blog_title{
+    font-size: small;
+    text-align:center;
+}
+
+/* 标题的日期 */
+.blog_explain{
+    color:black;
+    font-size: xx-small;
+    text-align: right;
+}

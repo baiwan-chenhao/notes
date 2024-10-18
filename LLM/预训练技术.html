@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>预训练技术</title>
+  <style>
+    html {
+      line-height: 1.5;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 1em;
+      }
+    }
+    @media print {
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, 'Lucida Console', Consolas, monospace;
+      font-size: 85%;
+      margin: 0;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<p>预训练阶段</p>
+<p>找10t规模数据，数据清洗很重要。要在数据清洗的时候把 code 等格式化数据摘出来再清洗。bert表征能力强于gpt。清洗数据时规则也很重要。数据去重。</p>
+<p>数据去重工作有一个比较重要的意识：要先确定需要多少训练数据，再确定去重的粒度。去重工作是没有尽头的，任何时候你都能把数据继续洗下去，所以必须明确自己需要多少训练数据。需要 10T 训练数据，就卡相似度在 80% 的阈值进行去重；需要 5T 的训练数据，就卡相似度在 90% 的阈值进行去重；以此类推。目前没有任工作能证明，一条数据在 pretrain 阶段训多少遍对模型是最友好的。因此，大胆的按需去重，即使去重粒度小，导致一篇文档出现多次，也可以通过让两篇相似文档之间隔尽量多的 token 来降低影响。</p>
+<p>大部分的技术报告里，应该都提及了自己的数据是如何配比的，基本上都是“知识 + 代码 + 逻辑”三个大类目，其中知识数据分文中文知识和英文知识，逻辑数据则可以认为是 math 数据和 cot 数据的混合体。整体上，大部分中文模型的配比都在这个区间左右：中：英：code = 4:4:2（逻辑数据的比例我没有写进去，加入多少取决于你能收集多少，其他三类数据应该是要多少有多少的存在）。我们可以根据自己的实际情况调整配比，但英文的比例一定不能太低。目前中文数据的质量不如英文数据质量基本已经成功共识，导致这个现象可能有两个原因：中文确实比英文难学，语言空间的复杂度更高；中文语料无论是干净程度还是数量级，都无法与英文语料相比较。</p>
+<p>课程学习。</p>
+<p>每个数据块在训练代码中，自然会对应着一个 save_checkpoint 的操作，原因也是为了便于训练回退。这里可以分享一个以前的小技巧，曾经因为 warmup 阶段，数据块大小是动态增长的，阴差阳错地导致模型的保存逻辑始终为 False。我们眼睁睁看着 tensorboard 美丽的符合预期的 loss 曲线，但就是没办法让它 save，浪费了好一通算力。汲取教训之后，组里大佬就发明了一个机制，在训练代码加了个逻辑：如果检测到某个文件夹下存在一个叫“save”的文件，则立刻 save_checkpoint，我们将其称为模型动态保存机制（一脸骄傲）。</p>
+<p>https://arxiv.org/abs/2310.10638</p>
+<p>先走scalinglaw再train大模型。</p>
+<p>从零开始的 pretrain 必须选 megatron，continue-pretrain 可以考虑使用 deepspeed， 换句话说，T 级别的 token 训练量必须是 megatron，B 的级别 token 训练量无所谓</p>
+<p>概率探针</p>
+<h1 id="参考">参考</h1>
+<ol type="1">
+<li><a href="https://mp.weixin.qq.com/s/pUJsZVBN_Gh2yBF3g5XhKA">全是细节 | 聊一聊做Pretrain的经验 (qq.com)</a>（2024/10）</li>
+</ol>
+</body>
+</html>
